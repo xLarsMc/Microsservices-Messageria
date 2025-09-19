@@ -27,7 +27,7 @@ namespace GeekShopping.ProductAPI.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     category_name = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    image_url = table.Column<string>(type: "varchar(300)", maxLength: 300, nullable: false)
+                    image_url = table.Column<string>(type: "varchar(2000)", maxLength: 2000, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>

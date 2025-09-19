@@ -44,7 +44,7 @@ namespace GeekShopping.ProductAPI.Migrations
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
-                        .HasMaxLength(300)
+                        .HasMaxLength(2000)
                         .HasColumnType("varchar(300)")
                         .HasColumnName("image_url");
 
