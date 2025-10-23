@@ -1,6 +1,7 @@
 using AutoMapper;
 using GeekShopping.CartAPI.Config;
 using GeekShopping.CartAPI.Model.Context;
+using GeekShopping.CartAPI.RabbitMQSender;
 using GeekShopping.CartAPI.Repository;
 using Microsoft.EntityFrameworkCore;
 
@@ -35,6 +36,8 @@ builder.Services.AddDbContext<MySQLContext>(opt =>
                                         opt.UseMySql(connection, serverVersion));
 
 builder.Services.AddScoped<ICartRepository, CartRepository>();
+
+builder.Services.AddSingleton<IRabbitMQMessageSender, RabbitMQMessageSender>();
 
 var app = builder.Build();
 

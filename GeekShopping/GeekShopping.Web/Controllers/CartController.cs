@@ -59,6 +59,22 @@ namespace GeekShopping.Web.Controllers
         {
             return View(await FindCart());
         }
+        
+        [HttpPost]
+        public async Task<IActionResult> Checkout(CartViewModel model)
+        {
+            var response = await _cartService.Checkout(model.CartHeader);
+
+            if (response != null) return RedirectToAction(nameof(Confirmation));
+
+            return View(model);
+        }
+
+        public async Task<IActionResult> Confirmation()
+        {
+            return View();
+        }
+
         private async Task<CartViewModel> FindCart()
         {
             var response = await _cartService.FindCart();
