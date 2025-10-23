@@ -8,7 +8,7 @@ namespace GeekShopping.CartAPI.Repository
         Task<CartDTO> SaveOrUpdateCart(CartDTO cart);
         Task<bool> RemoveFromCart(long cartDetailsId);
         Task<bool> ApplyCoupon(string couponCode);
-        Task<bool> RemoveCoupon(long cartDetailsId);
+        Task<bool> RemoveCoupon();
         Task<bool> ClearCart();
     }
 }

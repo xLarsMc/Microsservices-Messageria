@@ -17,9 +17,32 @@ namespace GeekShopping.CartAPI.Repository
             _mapper = mapper;
         }
 
-        public Task<bool> ApplyCoupon(string couponCode)
+        public async Task<bool> ApplyCoupon(string couponCode)
         {
-            throw new NotImplementedException();
+            var header = await _context.CartHeaders.FirstOrDefaultAsync();
+
+            if (header != null)
+            {
+                header.CouponCode = couponCode;
+                _context.CartHeaders.Update(header);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<bool> RemoveCoupon()
+        {
+            var header = await _context.CartHeaders.FirstOrDefaultAsync();
+
+            if (header != null)
+            {
+                header.CouponCode = "";
+                _context.CartHeaders.Update(header);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            return false;
         }
 
         public async Task<bool> ClearCart()
@@ -35,7 +58,8 @@ namespace GeekShopping.CartAPI.Repository
                 _context.CartHeaders.Remove(cartHeader);
                 await _context.SaveChangesAsync();
                 return true;
-            } return false;
+            } 
+            return false;
         }
 
         public async Task<CartDTO> FindCart()
@@ -51,11 +75,6 @@ namespace GeekShopping.CartAPI.Repository
                 .Where(c => c.CartHeaderId == cart.CartHeader.Id)
                 .Include(c => c.Product).ToListAsync();
             return _mapper.Map<CartDTO>(cart);
-        }
-
-        public async Task<bool> RemoveCoupon(long cartDetailsId)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task<bool> RemoveFromCart(long cartDetailsId)
