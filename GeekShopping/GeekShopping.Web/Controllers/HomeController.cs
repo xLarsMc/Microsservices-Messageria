@@ -37,7 +37,7 @@ public class HomeController : Controller
         {
             CartHeader = new CartHeaderViewModel()
             {
-                CouponCode = "pra n deixar null"
+                CouponCode = ""
             }
         };
 
@@ -49,7 +49,7 @@ public class HomeController : Controller
             Product = await _productService.FindProductById(model.Id),
             CartHeader = new CartHeaderViewModel()
             {
-                CouponCode = "pra n deixar null"
+                CouponCode = ""
             },
         };
 
