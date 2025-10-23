@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using GeekShopping.CartAPI.Data.DTO;
+using GeekShopping.CartAPI.Model;
 
 namespace GeekShopping.CartAPI.Config
 {
@@ -6,16 +8,15 @@ namespace GeekShopping.CartAPI.Config
     {
         public MapperConfig()
         {
-            DTOToModel();
-            ModelToDTO();
+            RegisterMaps();
         }
 
-        private void DTOToModel()
+        private void RegisterMaps()
         {
-        }
-
-        private void ModelToDTO()
-        {
+            CreateMap<Product, ProductDTO>().ReverseMap();
+            CreateMap<Cart, CartDTO>().ReverseMap();
+            CreateMap<CartDetail, CartDetailDTO>().ReverseMap();
+            CreateMap<CartHeader, CartHeaderDTO>().ReverseMap();
         }
     }
 }

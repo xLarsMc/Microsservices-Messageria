@@ -9,10 +9,12 @@ public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
     private readonly IProductService _productService;
-    public HomeController(ILogger<HomeController> logger, IProductService productService)
+    private readonly ICartService _cartService;
+    public HomeController(ILogger<HomeController> logger, IProductService productService, ICartService cartService)
     {
         _logger = logger;
         _productService = productService;
+        _cartService = cartService;
     }
 
     public async Task<IActionResult> Index()
@@ -25,6 +27,44 @@ public class HomeController : Controller
     {
         var product = await _productService.FindProductById(id);
         return View(product);
+    }
+
+    [HttpPost]
+    [ActionName("Details")]
+    public async Task<IActionResult> DetailsPost(ProductViewModel model)
+    {
+        CartViewModel cart = new CartViewModel()
+        {
+            CartHeader = new CartHeaderViewModel()
+            {
+                CouponCode = "pra n deixar null"
+            }
+        };
+
+
+        CartDetailViewModel cartDetail = new CartDetailViewModel()
+        {
+            Count = model.Count,
+            ProductId = model.Id,
+            Product = await _productService.FindProductById(model.Id),
+            CartHeader = new CartHeaderViewModel()
+            {
+                CouponCode = "pra n deixar null"
+            },
+        };
+
+        List<CartDetailViewModel> cartDetails = new List<CartDetailViewModel>();
+
+        cartDetails.Add(cartDetail);
+
+        cart.CartDetails = cartDetails;
+        var response = await _cartService.AddItemToCart(cart);
+
+        if(response != null)
+        {
+            return RedirectToAction(nameof(Index));
+        }
+        return View(model);
     }
 
     public IActionResult Privacy()

@@ -1,13 +1,19 @@
 using AutoMapper;
 using GeekShopping.CartAPI.Config;
 using GeekShopping.CartAPI.Model.Context;
+using GeekShopping.CartAPI.Repository;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        // suprimir o filtro automático que retorna 400 antes do action
+        options.SuppressModelStateInvalidFilter = true;
+    });
 
-builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -16,7 +22,7 @@ builder.Services.AddSwaggerGen(c =>
     {
         Title = "GeekShopping.CartAPI",
         Version = "v1",
-        Description = "API Microsserviço - Produto"
+        Description = "API Microsserviço - Carrinho de compras"
     });
 });
 
@@ -28,6 +34,8 @@ builder.Services.AddAutoMapper(typeof(MapperConfig).Assembly);
 builder.Services.AddDbContext<MySQLContext>(opt =>
                                         opt.UseMySql(connection, serverVersion));
 
+builder.Services.AddScoped<ICartRepository, CartRepository>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -36,7 +44,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("http://localhost:5208/swagger/v1/swagger.json", "GeekShopping.CartAPI v1");
+        c.SwaggerEndpoint("http://localhost:5308/swagger/v1/swagger.json", "GeekShopping.CartAPI v1");
     });
 
 }
