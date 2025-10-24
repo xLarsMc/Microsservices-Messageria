@@ -1,21 +1,21 @@
-﻿using GeekShopping.OrderAPI.Messages;
-using GeekShopping.OrderAPI.Repository;
+﻿using GeekShopping.Email.Messages;
+using GeekShopping.Email.Repository;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
 using System.Text.Json;
 
-namespace GeekShopping.OrderAPI.MessageConsumer
+namespace GeekShopping.Email.MessageConsumer
 {
     public class RabbitMQPaymentConsumer : BackgroundService
     {
-        private readonly OrderRepository _repository;
+        private readonly EmailRepository _repository;
         private IConnection _connection;
         private IChannel _channel;
         private const string _exchangeName = "DirectPaymentExchangeUpdate";
-        private const string _paymentOrderUpdateQueueName = "PaymentOrderUpdateQueueName";
+        private const string _paymentEmailUpdateQueueName = "PaymentEmailUpdateQueueName";
 
-        public RabbitMQPaymentConsumer(OrderRepository repository)
+        public RabbitMQPaymentConsumer(EmailRepository repository)
         {
             _repository = repository;
         }
@@ -33,28 +33,28 @@ namespace GeekShopping.OrderAPI.MessageConsumer
             _channel = await _connection.CreateChannelAsync();
 
             await _channel.ExchangeDeclareAsync(_exchangeName, ExchangeType.Direct);
-            await _channel.QueueDeclareAsync(_paymentOrderUpdateQueueName, false, false, false, null);
-            await _channel.QueueBindAsync(_paymentOrderUpdateQueueName, _exchangeName, "PaymentOrder");
+            await _channel.QueueDeclareAsync(_paymentEmailUpdateQueueName, false, false, false, null);
+            await _channel.QueueBindAsync(_paymentEmailUpdateQueueName, _exchangeName, "PaymentEmail");
 
             var consumer = new AsyncEventingBasicConsumer(_channel);
 
             consumer.ReceivedAsync += async (chanel, evt) =>
             {
                 var content = Encoding.UTF8.GetString(evt.Body.ToArray());
-                UpdatePaymentResultDTO dto = JsonSerializer.Deserialize<UpdatePaymentResultDTO>(content);
-                await UpdatePaymentStatus(dto);
+                UpdatePaymentResultMessage message = JsonSerializer.Deserialize<UpdatePaymentResultMessage>(content);
+                await ProcessLogs(message);
                 await _channel.BasicAckAsync(evt.DeliveryTag, false);
             };
 
-            await _channel.BasicConsumeAsync(_paymentOrderUpdateQueueName, false, consumer);
+            await _channel.BasicConsumeAsync(_paymentEmailUpdateQueueName, false, consumer);
 
         }
 
-        private async Task UpdatePaymentStatus(UpdatePaymentResultDTO dto)
+        private async Task ProcessLogs(UpdatePaymentResultMessage message)
         {
             try
             {
-                await _repository.UpdateOrderPaymentStatus(dto.OrderId, dto.Status);
+                await _repository.LogEmail(message);
             }
             catch (Exception)
             {

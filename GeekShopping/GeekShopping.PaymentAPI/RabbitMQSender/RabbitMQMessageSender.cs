@@ -12,7 +12,9 @@ namespace GeekShopping.PaymentAPI.RabbitMQSender
         private readonly string _password;
         private readonly string _username;
         private IConnection _connection;
-        private const string _exchangeName = "FanoutPaymentExchangeUpdate";
+        private const string _exchangeName = "DirectPaymentExchangeUpdate";
+        private const string _paymentEmailUpdateQueueName = "PaymentEmailUpdateQueueName";
+        private const string _paymentOrderUpdateQueueName = "PaymentOrderUpdateQueueName";
 
         public RabbitMQMessageSender()
         {
@@ -28,14 +30,28 @@ namespace GeekShopping.PaymentAPI.RabbitMQSender
                 using var channel = await _connection.CreateChannelAsync();
                 using var model = await _connection.CreateChannelAsync();
 
-                await channel.ExchangeDeclareAsync(_exchangeName, ExchangeType.Fanout, durable: false);
+                await channel.ExchangeDeclareAsync(_exchangeName, ExchangeType.Direct, durable: false);
+
+                await channel.QueueDeclareAsync(_paymentEmailUpdateQueueName, false, false, false, null);
+                await channel.QueueDeclareAsync(_paymentOrderUpdateQueueName, false, false, false, null);
+
+                await channel.QueueBindAsync(_paymentEmailUpdateQueueName, _exchangeName, "PaymentEmail");
+                await channel.QueueBindAsync(_paymentOrderUpdateQueueName, _exchangeName, "PaymentOrder");
+
 
                 byte[] body = GetMessageAsByteArray(baseMessage);
 
 
                 await channel.BasicPublishAsync(
                         exchange: _exchangeName,
-                        "",
+                        "PaymentEmail",
+                        mandatory: false,
+                        basicProperties: new BasicProperties { Persistent = true },
+                        body: body);
+                
+                await channel.BasicPublishAsync(
+                        exchange: _exchangeName,
+                        "PaymentOrder",
                         mandatory: false,
                         basicProperties: new BasicProperties { Persistent = true },
                         body: body);
