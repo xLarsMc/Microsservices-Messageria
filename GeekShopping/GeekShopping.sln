@@ -21,6 +21,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeekShopping.MessageBus", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeekShopping.OrderAPI", "GeekShopping.OrderAPI\GeekShopping.OrderAPI.csproj", "{240CE5CD-BDF6-4511-A240-D09E5507FCA7}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Payments", "Payments", "{1E7C71CC-359A-4B56-B2DF-F24B464547EC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeekShopping.PaymentProcessor", "GeekShopping.PaymentProcessor\GeekShopping.PaymentProcessor.csproj", "{D8C73BF8-7BE4-435C-ACC8-AA0512466B56}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeekShopping.PaymentAPI", "GeekShopping.PaymentAPI\GeekShopping.PaymentAPI.csproj", "{29CD6453-7135-4752-A071-DCE2302403AA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +57,14 @@ Global
 		{240CE5CD-BDF6-4511-A240-D09E5507FCA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{240CE5CD-BDF6-4511-A240-D09E5507FCA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{240CE5CD-BDF6-4511-A240-D09E5507FCA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8C73BF8-7BE4-435C-ACC8-AA0512466B56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8C73BF8-7BE4-435C-ACC8-AA0512466B56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8C73BF8-7BE4-435C-ACC8-AA0512466B56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8C73BF8-7BE4-435C-ACC8-AA0512466B56}.Release|Any CPU.Build.0 = Release|Any CPU
+		{29CD6453-7135-4752-A071-DCE2302403AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29CD6453-7135-4752-A071-DCE2302403AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29CD6453-7135-4752-A071-DCE2302403AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29CD6453-7135-4752-A071-DCE2302403AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -62,6 +76,8 @@ Global
 		{C43A280E-D4F8-471E-803D-F1088FA98667} = {C06DB18C-1A11-4548-9472-F907E000758A}
 		{2C31C47B-E965-4FE0-8F9D-938DE70BF9C2} = {F1061C16-75B7-4FF9-A11A-B4E05F07C664}
 		{240CE5CD-BDF6-4511-A240-D09E5507FCA7} = {C06DB18C-1A11-4548-9472-F907E000758A}
+		{D8C73BF8-7BE4-435C-ACC8-AA0512466B56} = {1E7C71CC-359A-4B56-B2DF-F24B464547EC}
+		{29CD6453-7135-4752-A071-DCE2302403AA} = {C06DB18C-1A11-4548-9472-F907E000758A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A58417B2-89C9-4F50-874E-E45BAA071CA3}

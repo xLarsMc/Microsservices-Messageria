@@ -17,6 +17,8 @@ namespace GeekShopping.OrderAPI.Repository
         {
             if (header == null) return false;
 
+            header.CouponCode = "";
+
             await using var _db = new MySQLContext(_context);
 
             _db.Headers.Add(header);

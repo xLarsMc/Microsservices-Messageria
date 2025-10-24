@@ -1,5 +1,6 @@
 using GeekShopping.OrderAPI.MessageConsumer;
 using GeekShopping.OrderAPI.Model.Context;
+using GeekShopping.OrderAPI.RabbitMQSender;
 using GeekShopping.OrderAPI.Repository;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,7 +19,7 @@ builder.Services.AddSwaggerGen(c =>
         Version = "v1",
         Description = "API Microsserviço - Order"
     });
-}); ;
+});
 
 var connection = builder.Configuration.GetConnectionString("DefaultConnection");
 var serverVersion = new MySqlServerVersion(new Version(8, 4, 6));
@@ -33,6 +34,9 @@ builderDB.UseMySql(connection,
 builder.Services.AddSingleton(new OrderRepository(builderDB.Options));
 
 builder.Services.AddHostedService<RabbitMQCheckoutConsumer>();
+builder.Services.AddHostedService<RabbitMQPaymentConsumer>();
+
+builder.Services.AddSingleton<IRabbitMQMessageSender, RabbitMQMessageSender>();
 
 var app = builder.Build();
 

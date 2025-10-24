@@ -1,10 +1,10 @@
-﻿using GeekShopping.CartAPI.Messages;
-using GeekShopping.MessageBus;
+﻿using GeekShopping.MessageBus;
+using GeekShopping.PaymentAPI.Messages;
 using RabbitMQ.Client;
 using System.Text;
 using System.Text.Json;
 
-namespace GeekShopping.CartAPI.RabbitMQSender
+namespace GeekShopping.PaymentAPI.RabbitMQSender
 {
     public class RabbitMQMessageSender : IRabbitMQMessageSender
     {
@@ -12,6 +12,7 @@ namespace GeekShopping.CartAPI.RabbitMQSender
         private readonly string _password;
         private readonly string _username;
         private IConnection _connection;
+        private const string _exchangeName = "FanoutPaymentExchangeUpdate";
 
         public RabbitMQMessageSender()
         {
@@ -20,21 +21,21 @@ namespace GeekShopping.CartAPI.RabbitMQSender
             _username = "guest";
         }
 
-        public async void SendMessage(BaseMessage baseMessage, string queueName)
+        public async void SendMessage(BaseMessage baseMessage)
         {
-            if (await ConectionExistsAsync())
+            if (await ConectionExists())
             {
                 using var channel = await _connection.CreateChannelAsync();
                 using var model = await _connection.CreateChannelAsync();
 
-                await channel.QueueDeclareAsync(queue: queueName, false, false, false, arguments: null);
+                await channel.ExchangeDeclareAsync(_exchangeName, ExchangeType.Fanout, durable: false);
 
                 byte[] body = GetMessageAsByteArray(baseMessage);
 
 
                 await channel.BasicPublishAsync(
-                        exchange: "",
-                        routingKey: queueName,
+                        exchange: _exchangeName,
+                        "",
                         mandatory: false,
                         basicProperties: new BasicProperties { Persistent = true },
                         body: body);
@@ -48,7 +49,7 @@ namespace GeekShopping.CartAPI.RabbitMQSender
                 WriteIndented = true
             };
 
-            var json = JsonSerializer.Serialize<CheckoutHeaderDTO>((CheckoutHeaderDTO)baseMessage, opt);
+            var json = JsonSerializer.Serialize<UpdatePaymentResultMessage>((UpdatePaymentResultMessage)baseMessage, opt);
 
             var body = Encoding.UTF8.GetBytes(json);
 
@@ -73,7 +74,7 @@ namespace GeekShopping.CartAPI.RabbitMQSender
             }
         }
 
-        private async Task<bool> ConectionExistsAsync()
+        private async Task<bool> ConectionExists()
         {
             if (_connection != null) return true;
             await CreateConnection();

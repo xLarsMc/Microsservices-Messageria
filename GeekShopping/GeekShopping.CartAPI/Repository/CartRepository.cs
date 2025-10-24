@@ -51,9 +51,9 @@ namespace GeekShopping.CartAPI.Repository
 
             if(cartHeader != null)
             {
-                _context.CartDetails
-                    .RemoveRange(
-                    _context.CartDetails.Where(c => c.CartHeaderId == cartHeader.Id));
+                var items = await _context.CartDetails.Where(c => c.CartHeaderId == cartHeader.Id).ToListAsync();
+
+                _context.CartDetails.RemoveRange(items);
 
                 _context.CartHeaders.Remove(cartHeader);
                 await _context.SaveChangesAsync();
@@ -68,7 +68,7 @@ namespace GeekShopping.CartAPI.Repository
 
             Cart cart = new()
             {
-                CartHeader = cartHeader,
+                CartHeader = cartHeader ?? new CartHeader(),
             };
 
             cart.CartDetails = await _context.CartDetails
