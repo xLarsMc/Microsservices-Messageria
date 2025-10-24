@@ -10,19 +10,21 @@ namespace GeekShopping.CartAPI.Controllers;
 [Route("api/[controller]")]
 public class CartController : ControllerBase
 {
-    private ICartRepository _repository;
+    private ICartRepository _cartRepository;
+    private ICouponRepository _couponRepository;
     private IRabbitMQMessageSender _rabbitMQMessageSender;
 
-    public CartController(ICartRepository repository, IRabbitMQMessageSender rabbitMQMessageSender)
+    public CartController(ICartRepository repository, ICouponRepository couponRepository, IRabbitMQMessageSender rabbitMQMessageSender)
     {
-        _repository = repository;
+        _cartRepository = repository;
+        _couponRepository = couponRepository;
         _rabbitMQMessageSender = rabbitMQMessageSender;
     }
 
     [HttpGet("find-cart")]
     public async Task<ActionResult<CartDTO>> FindById()
     {
-        var cart = await _repository.FindCart();
+        var cart = await _cartRepository.FindCart();
 
         if (cart == null) return NotFound();
 
@@ -43,7 +45,7 @@ public class CartController : ControllerBase
         }
 
 
-        var cartResult = await _repository.SaveOrUpdateCart(cart);
+        var cartResult = await _cartRepository.SaveOrUpdateCart(cart);
 
         if (cartResult == null) return NotFound();
 
@@ -53,7 +55,7 @@ public class CartController : ControllerBase
     [HttpPut("update-cart")]
     public async Task<ActionResult<CartDTO>> UpdateCart([FromBody] CartDTO cart)
     {
-        var cartResult = await _repository.SaveOrUpdateCart(cart);
+        var cartResult = await _cartRepository.SaveOrUpdateCart(cart);
 
         if (cartResult == null) return NotFound();
 
@@ -63,7 +65,7 @@ public class CartController : ControllerBase
     [HttpDelete("remove-cart/{id}")]
     public async Task<ActionResult<CartDTO>> RemoveCart(int id)
     {
-        var status = await _repository.RemoveFromCart(id);
+        var status = await _cartRepository.RemoveFromCart(id);
 
         if (!status) return BadRequest();
 
@@ -73,7 +75,7 @@ public class CartController : ControllerBase
     [HttpPost("apply-coupon")]
     public async Task<ActionResult<CartDTO>> ApplyCoupon([FromBody] CartDTO cart)
     {
-        var status = await _repository.ApplyCoupon(cart.CartHeader.CouponCode);
+        var status = await _cartRepository.ApplyCoupon(cart.CartHeader.CouponCode);
 
         if (!status) return NotFound();
 
@@ -83,19 +85,26 @@ public class CartController : ControllerBase
     [HttpDelete("remove-coupon")]
     public async Task<ActionResult<CartDTO>> RemoveCoupon()
     {
-        var status = await _repository.RemoveCoupon();
+        var status = await _cartRepository.RemoveCoupon();
 
         if (!status) return NotFound();
 
         return Ok(status);
     }
     
-    [HttpPost("Checkout")]
+    [HttpPost("checkout")]
     public async Task<ActionResult<CheckoutHeaderDTO>> Checkout(CheckoutHeaderDTO dto)
     {
-        var cart = await _repository.FindCart();
+        var cart = await _cartRepository.FindCart();
 
         if (cart == null) return NotFound();
+
+        if (!string.IsNullOrEmpty(dto.CouponCode))
+        {
+            CouponDTO cooupon = await _couponRepository.GetCouponByCouponCode(dto.CouponCode);
+
+            if (dto.DiscountAmount != cooupon.DiscountAmount) return StatusCode(412);
+        }
 
         dto.CartDetails = cart.CartDetails;
         dto.DateTime = DateTime.Now;
